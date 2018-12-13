@@ -61,7 +61,9 @@ router.get('/user/token', async function(req, res) {
 
         res.json({ token: credentials.access_token, expires_in: credentials.expires_in });
 
-        setTimeout(() => getToken(req.session, client_id, client_secret), 500000);
+        // Will call it a bit earlier than the actual expiration time, that's why
+        // multiplying it with 900 instead of 1000 to convert from s to ms 
+        setTimeout(() => getToken(req.session, client_id, client_secret), credentials.expires_in * 900);
     } catch (err) {
         res.status(500).end(err);
     }
