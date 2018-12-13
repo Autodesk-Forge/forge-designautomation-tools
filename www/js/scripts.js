@@ -345,28 +345,41 @@ function createItem(type) {
         alias: node.original.alias
     }
 
+    let request = function (type, data, node) {
+        $.ajax({
+            url: `/da/${type}`,
+            type: 'POST',
+            data: JSON.stringify(data),
+            dataType: 'json',
+            contentType: 'application/json',
+            success: function (data) {
+                $(`#${type}Info`).val(JSON.stringify(data, null, 2));
+                
+                // Refresh the node's chidren 
+                $(`#${type}Tree`).jstree(true).refresh_node(node.id); 
+            },
+            error: function (err) {
+                $(`#${type}Info`).val(JSON.stringify(err.responseJSON, null, 2));
+            }
+        });
+    };
+
     if (node.type === 'version') {
         // get alias name from user
-        var alias = prompt("Name to use for the alias", "");
-        data.alias = alias;
+        var inputs = { 
+            'alias': {
+                'text': 'Alias name',
+                'placeholder': 'Alias name',
+                'value': 'e.g. v12'
+            }
+        };
+        var alias = getInputs('Info', inputs, () => {
+            data.alias = inputs.alias.value;
+            request(type, data, node);
+        });
+    } else {
+        request(type, data, node);
     }
-
-    $.ajax({
-        url: `/da/${type}`,
-        type: 'POST',
-        data: JSON.stringify(data),
-        dataType: 'json',
-        contentType: 'application/json',
-        success: function (data) {
-            $(`#${type}Info`).val(JSON.stringify(data, null, 2));
-            
-            // Refresh the node's chidren 
-            $(`#${type}Tree`).jstree(true).refresh_node(node.id); 
-        },
-        error: function (err) {
-            $(`#${type}Info`).val(JSON.stringify(err.responseJSON, null, 2));
-        }
-    });
 }
 
 function prepareItemsTree(type) {
@@ -420,6 +433,43 @@ function prepareItemsTree(type) {
             }
         }
     });
+}
+
+// 'inputs' is an array of objects with 'text', 'placeholder' and 'value' parameters 
+function getInputs(title, inputs, callback) {
+    const modelDialog = 'myModal';
+
+    $('#myModal_title').html(title);
+
+    let body = '';
+    Object.keys(inputs).forEach(function (key) {
+        let input = inputs[key];
+        body += 
+            `<div class="input-group mb-3">
+                <div class="input-group-addon">
+                    <span class="input-group-text" id="${modelDialog}_${key}_prepend">${input.text}</span>
+                </div>
+                <input id="${modelDialog}_${key}" type="text" class="form-control" placeholder="${input.value}" aria-label="${modelDialog}_${key}" aria-describedby="${modelDialog}_${key}_prepend">
+            </div>`;
+    })
+
+    $('#myModal_body').html(body);
+
+    var onClose = function () {
+        $('#myModal').off('hidden.bs.modal', onClose);
+
+        // Update values
+        Object.keys(inputs).forEach(function (key) {
+            let input = inputs[key];
+            input.value = $(`#${modelDialog}_${key}`).val();
+        })
+
+        callback();
+    }
+
+    $('#myModal').on('hidden.bs.modal', onClose);
+
+    $('#myModal').modal();
 }
 
 /////////////////////////////////////////////////////////////////
@@ -520,6 +570,7 @@ function getActiveConfigurationProperties (viewer) {
 // *******************************************
 // Property Inspector Extension
 // *******************************************
+
 function PropertyInspectorExtension(viewer, options) {
     Autodesk.Viewing.Extension.call(this, viewer, options);
     this.panel = null;

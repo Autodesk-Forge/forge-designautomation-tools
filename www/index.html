@@ -93,8 +93,7 @@
 
                                 <div class="col-sm-8">
                                     <textarea id="appbundlesInfo" class="form-control" rows="3"></textarea>
-                                    <a id="appbundlesInfo_paste" style="display: inline-block; margin-top: 5px;"
-                                        class="btn btn-default">
+                                    <a id="appbundlesInfo_paste" style="display: inline-block; margin-top: 5px;" class="btn btn-default">
                                         <span class="glyphicon glyphicon-paste"></span>
                                     </a>
                                 </div>
@@ -118,10 +117,9 @@
 
                                 <div class="col-sm-8">
                                     <textarea id="activitiesInfo" class="form-control" rows="3"></textarea>
-                                    <a id="activitiesInfo_paste" style="display: inline-block; margin-top: 5px;"
-                                    class="btn btn-default">
-                                    <span class="glyphicon glyphicon-paste"></span>
-                                </a>
+                                    <a id="activitiesInfo_paste" style="display: inline-block; margin-top: 5px;" class="btn btn-default">
+                                        <span class="glyphicon glyphicon-paste"></span>
+                                    </a>
                                 </div>
                             </div>
                             <div class="tab-pane fade" id="pills-workitems" role="tabpanel" aria-labelledby="pills-workitems-tab">
@@ -134,7 +132,24 @@
         </div> <!-- jumbotron -->
     </div>
 
-    <iframe id="fusionLoader" width="1" height="1" style="visibility:hidden"></iframe>
+    <!-- Modal Dialog for getting info -->
+    <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 id="myModal_title" class="modal-title">Modal Header</h4>
+                </div>
+                <div id="myModal_body" class="modal-body">
+                   
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
