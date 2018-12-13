@@ -377,6 +377,30 @@ function createItem(type) {
             data.alias = inputs.alias.value;
             request(type, data, node);
         });
+    } else if (node.type === 'folder') {
+        // get alias name from user
+        var inputs = { 
+            'engine': {
+                'text': 'Engine',
+                'value': 'e.g. Autodesk.Inventor+23'
+            },
+            'description': {
+                'text': 'Description',
+                'value': 'Describe the app bundle'
+            },
+            'id': {
+                'text': 'Id',
+                'value': 'e.g. MyChangeParams'
+            }
+        };
+        var alias = getInputs('Info', inputs, () => {
+            data.body = {};
+            Object.keys(inputs).forEach(function (key) {
+                data.body[key] = inputs[key].value;
+            });
+
+            request(type, data, node);
+        });
     } else {
         request(type, data, node);
     }

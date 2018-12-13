@@ -252,8 +252,8 @@ async function getItem(req, type, id) {
     return response;
 }
 
-async function createItem(req, type, id) {
-    let response = await request(req, `${type}`, 'POST');
+async function createItem(req, type, body) {
+    let response = await request(req, `${type}`, 'POST', null, body);
 
     return { response: 'done' };
 }
@@ -446,7 +446,7 @@ router.post('/:type', jsonParser, async function(req, res) {
 
         if (level === 1) {
             // create item for folder
-            var reply = await createItem(req, type);
+            var reply = await createItem(req, type, req.body.body);
             res.json(reply);
         } else if (level === 2) {
             // create version for item
@@ -458,6 +458,7 @@ router.post('/:type', jsonParser, async function(req, res) {
             res.json(reply);
         }
     } catch (ex) {
+        console.log(ex);
         res.status(ex.statusCode).json({ message: ex.message });
     }
 });
