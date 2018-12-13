@@ -1,0 +1,86 @@
+.nav-pills>li.active>a:focus, .nav-pills>li.active>a:hover {
+    color: #fff;
+    background-color: #337ab7;
+}
+
+.nav-pills>li>a:hover {
+    color: #337ab7;
+    background-color: #fff;
+}
+
+
+
+
+.forgeTreeContainer {
+    overflow: hidden; padding:0;  border:1px solid silver; height:500px;
+}
+.forgeControlContainer {
+    padding: 10px;
+    width: 100%; position: absolute;
+    display: inline-block; overflow: auto;
+}
+.forgeControl {
+    width: 100%; position: absolute;
+    display: inline-block; overflow: auto;
+}
+.glyphicon-spin {
+    -webkit-animation: spin 1000ms infinite linear;
+    animation: spin 1000ms infinite linear;
+}
+
+
+#forgeHierarchy {
+    height: 250px; top: 0;
+}
+#forgeFileOptions {
+    height: 55px;   top: 245px;
+    border-top-width: 1px; border-top-color: silver; border-top-style: solid;
+}
+#forgeProperties {
+    height: 195px;  bottom: 0;
+    border-top-width: 1px; border-top-color: silver; border-top-style: solid;
+}
+#forgeCreateBucket {
+    height: 135px;   bottom: 0px;
+    border-top-width: 1px; border-top-color: silver; border-top-style: solid;
+    overflow: hidden;
+}
+#appbundlesTree, #appbundlesInfo, #activitiesTree, #activitiesInfo {
+    height: 363px;
+    overflow: auto;
+}
+.tab-pane {
+    margin: 15px; 
+}
+#forgeFormats {
+    vertical-align: middle;
+}
+#forgeUploadHidden {
+    visibility: hidden;
+}
+
+
+@-webkit-keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(359deg);
+        transform: rotate(359deg);
+    }
+}
+@keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(359deg);
+        transform: rotate(359deg);
+    }
+}
+
+.btn-primary.active {
+    background-color: limegreen;
+}

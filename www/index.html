@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0">
+    <title>Design Automation Manager</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="/css/jstree.style.min.css" />
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!--type="text/css">-->
+    <script language="JavaScript" src="/js/jquery.min.js"></script>
+    <script language="JavaScript" src="/js/jquery.storageapi.min.js"></script>
+    <script src="/js/jstree.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+
+    <!-- for the viewer -->
+    <script src="https://developer.api.autodesk.com/modelderivative/v2/viewers/three.min.js?v=v4.2"></script>
+    <script src="https://developer.api.autodesk.com/modelderivative/v2/viewers/viewer3D.js?v=v4.2"></script>
+    <link rel="stylesheet" href="https://developer.api.autodesk.com/modelderivative/v2/viewers/style.css?v=v4.2" />
+    <link rel="stylesheet" href="/css/index.css" />
+    <script language="JavaScript" src="/js/scripts.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="jumbotron">
+            <h3>Design Automation Manager - Basic Node.js Sample</h3>
+
+            <div class="row">
+                <div class="col-sm-4">
+                    <input id="client_id" placeholder="Client ID" style="display: inline-block;" class="input-small form-control" />
+                </div>
+                <div class="col-sm-4">
+                    <input id="client_secret" placeholder="Client Secret" style="display: inline-block;" class="input-small form-control" />
+                </div>
+                <div class="col-sm-4">
+                    <a href="#" id="authenticate" class="btn btn-warning btn-block">
+                        <span class="glyphicon glyphicon-user"></span>
+                        Log In
+                    </a>
+                </div>
+            </div> <!-- row -->
+
+            <div class="row">&nbsp;</div>
+
+            <div class="row">
+                <div class="col-sm-3">
+                    <div id="progressInfo" class="btn btn-info btn-block">
+                        <span id="progressInfoText">Progress info</span>
+                        <span id="progressInfoIcon"></span>
+                    </div>
+                </div>
+            </div> <!-- row -->
+
+            <div class="row">&nbsp;</div>
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <ul class="nav nav-tabs" id="pills-tab" role="tablist">
+                        <li class="nav-item active">
+                            <a class="nav-link active" id="pills-appbundles-tab" data-toggle="pill" href="#pills-appbundles"
+                                role="tab" aria-controls="pills-appbundles" aria-selected="true">AppBundles</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="pills-activities-tab" data-toggle="pill" href="#pills-activities"
+                                role="tab" aria-controls="pills-activities" aria-selected="false">Activities</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="pills-workitems-tab" data-toggle="pill" href="#pills-workitems"
+                                role="tab" aria-controls="pills-workitems" aria-selected="false">WorkItems</a>
+                        </li>
+                    </ul>
+                    <div class="row">
+                        <div class="tab-content" id="pills-tabAppBundles">
+                            <div class="tab-pane active in" id="pills-appbundles" role="tabpanel" aria-labelledby="pills-appbundles-tab">
+                                <div class="col-sm-4">
+                                    <div id="appbundlesTree" class="form-control">
+
+                                    </div>
+                                    <a id="appbundlesTree_refresh" style="display: inline-block; margin-top: 5px;"
+                                        class="btn btn-default">
+                                        <span class="glyphicon glyphicon-refresh"></span>
+                                    </a>
+                                    <a id="appbundlesTree_add" style="display: inline-block; margin-top: 5px;" class="btn btn-default">
+                                        <span class="glyphicon glyphicon-plus"></span>
+                                    </a>
+                                    <a id="appbundlesTree_delete" style="display: inline-block; margin-top: 5px;" class="btn btn-default">
+                                        <span class="glyphicon glyphicon-trash"></span>
+                                    </a>
+                                </div>
+
+                                <div class="col-sm-8">
+                                    <textarea id="appbundlesInfo" class="form-control" rows="3"></textarea>
+                                    <a id="appbundlesInfo_paste" style="display: inline-block; margin-top: 5px;"
+                                        class="btn btn-default">
+                                        <span class="glyphicon glyphicon-paste"></span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="pills-activities" role="tabpanel" aria-labelledby="pills-activities-tab">
+                                <div class="col-sm-4">
+                                    <div id="activitiesTree" class="form-control">
+
+                                    </div>
+                                    <a id="activitiesTree_refresh" style="display: inline-block; margin-top: 5px;"
+                                        class="btn btn-default">
+                                        <span class="glyphicon glyphicon-refresh"></span>
+                                    </a>
+                                    <a id="activitiesTree_add" style="display: inline-block; margin-top: 5px;" class="btn btn-default">
+                                        <span class="glyphicon glyphicon-plus"></span>
+                                    </a>
+                                    <a id="activitiesTree_delete" style="display: inline-block; margin-top: 5px;" class="btn btn-default">
+                                        <span class="glyphicon glyphicon-trash"></span>
+                                    </a>
+                                </div>
+
+                                <div class="col-sm-8">
+                                    <textarea id="activitiesInfo" class="form-control" rows="3"></textarea>
+                                    <a id="activitiesInfo_paste" style="display: inline-block; margin-top: 5px;"
+                                    class="btn btn-default">
+                                    <span class="glyphicon glyphicon-paste"></span>
+                                </a>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="pills-workitems" role="tabpanel" aria-labelledby="pills-workitems-tab">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- row -->
+        </div> <!-- jumbotron -->
+    </div>
+
+    <iframe id="fusionLoader" width="1" height="1" style="visibility:hidden"></iframe>
+</body>
+
+</html>
