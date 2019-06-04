@@ -37,7 +37,8 @@ async function request(req, path, method, headers, body) {
     return await rp(options);
 }
 
-router.post('/buckets', jsonParser, function(req, res) {
+router.post('POST /buckets', jsonParser, function(req, res) {
+    console.log('/buckets');
     var tokenSession = new token(req.session);
 
     var bucketName = req.body.bucketName
@@ -57,7 +58,8 @@ router.post('/buckets', jsonParser, function(req, res) {
 
 })
 
-router.get('/files/:id', function(req, res) {
+router.get('GET /files/:id', function(req, res) {
+    console.log('/files/:id');
     var id = req.params.id
     var boName = getBucketKeyObjectName(id)
 
@@ -78,6 +80,7 @@ router.get('/files/:id', function(req, res) {
 })
 
 router.delete('/files/:id', function(req, res) {
+    console.log('DELETE /files/:id');
     var tokenSession = new token(req.session)
 
     var id = req.params.id
@@ -95,6 +98,7 @@ router.delete('/files/:id', function(req, res) {
 })
 
 router.get('/files/:id/publicurl', function(req, res) {
+    console.log('GET /files/:id/publicurl');
     var id = req.params.id
     var boName = getBucketKeyObjectName(id)
 
@@ -111,6 +115,7 @@ router.get('/files/:id/publicurl', function(req, res) {
 })
 
 router.delete('/buckets/:id', function(req, res) {
+    console.log('DELETE /buckets/:id');
     var tokenSession = new token(req.session)
 
     var id = req.params.id
@@ -127,6 +132,7 @@ router.delete('/buckets/:id', function(req, res) {
 
 
 router.post('/files', jsonParser, function(req, res) {
+    console.log('POST /files');
     // Uploading a file to app bucket
 
     var tokenSession = new token(req.session);
@@ -180,6 +186,7 @@ router.post('/files', jsonParser, function(req, res) {
 });
 
 router.post('/chunks', rawParser, function(req, res) {
+    console.log('POST /chunks');
     // Uploading a file to app bucket
 
     var tokenSession = new token(req.session);
@@ -357,6 +364,7 @@ async function deleteItemAlias(req, type, id, alias) {
 }
 
 router.get('/:type/treeNode', async function(req, res) {
+    console.log('GET /:type/treeNode');
     try {
         var id = decodeURIComponent(req.query.id);
         var type = req.params.type;
@@ -398,6 +406,7 @@ router.get('/:type/treeNode', async function(req, res) {
 });
 
 router.get('/:type/info', async function(req, res) {
+    console.log('GET /:type/info');
     try {
         var id = decodeURIComponent(req.query.id);
         var type = req.params.type;
@@ -436,6 +445,7 @@ router.get('/:type/info', async function(req, res) {
 });
 
 router.post('/:type', jsonParser, async function(req, res) {
+    console.log('POST /:type');
     try {
         var id = req.body.id;
         var type = req.params.type;
@@ -464,6 +474,7 @@ router.post('/:type', jsonParser, async function(req, res) {
 });
 
 router.delete('/:type/:id', async function(req, res) {
+    console.log('DELETE /:type/:id');
     try {
         var id = decodeURIComponent(req.params.id);
         var type = req.params.type;
@@ -495,6 +506,7 @@ router.delete('/:type/:id', async function(req, res) {
 /////////////////////////////////////////////////////////////////
 
 router.get('/workitems/treeNode', async function(req, res) {
+    console.log('GET /workitems/treeNode');
     try {
         var id = decodeURIComponent(req.query.id);
         console.log("GET /workitems/treeNode, id = " + id);
