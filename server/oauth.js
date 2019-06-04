@@ -53,6 +53,7 @@ async function getToken(session, client_id, client_secret) {
 
 // wait for Autodesk callback (oAuth callback)
 router.get('/user/token', async function(req, res) {
+    console.log('/user/token');
     try {
         var client_id = req.query.client_id;
         var client_secret = req.query.client_secret;
@@ -65,7 +66,7 @@ router.get('/user/token', async function(req, res) {
         // multiplying it with 900 instead of 1000 to convert from s to ms 
         setTimeout(() => getToken(req.session, client_id, client_secret), credentials.expires_in * 900);
     } catch (err) {
-        res.status(500).end(err);
+        res.status(500).end(err.developerMessage);
     }
 });
 
