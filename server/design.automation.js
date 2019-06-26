@@ -401,7 +401,7 @@ router.get('/:type/treeNode', async function(req, res) {
             res.json(makeTree(versionAliases, 'alias', `${id}/`));
         }
     } catch (ex) {
-        res.status(ex.statusCode).json({ message: ex.message });
+        res.status(ex.statusCode ? ex.statusCode : 500).json({ message: (ex.message ? ex.message : ex) });
     }
 });
 
@@ -440,7 +440,7 @@ router.get('/:type/info', async function(req, res) {
             res.status(400).end();
         }
     } catch (ex) {
-        res.status(ex.statusCode).json({ message: ex.message });
+        res.status(ex.statusCode ? ex.statusCode : 500).json({ message: (ex.message ? ex.message : ex) });
     }
 });
 
@@ -469,7 +469,7 @@ router.post('/:type', jsonParser, async function(req, res) {
         }
     } catch (ex) {
         console.log(ex);
-        res.status(ex.statusCode).json({ message: ex.message });
+        res.status(ex.statusCode ? ex.statusCode : 500).json({ message: (ex.message ? ex.message : ex) });
     }
 });
 
@@ -497,7 +497,7 @@ router.delete('/:type/:id', async function(req, res) {
             res.json(reply);
         }
     } catch (ex) {
-        res.status(ex.statusCode).json({ message: ex.message });
+        res.status(ex.statusCode ? ex.statusCode : 500).json({ message: (ex.message ? ex.message : ex) });
     }
 });
 
@@ -542,7 +542,7 @@ router.get('/workitems/treeNode', async function(req, res) {
             res.json(makeTree(aliases, 'alias', `${id}/`));
         }
     } catch (ex) {
-        res.status(ex.statusCode).json({ message: ex.message });
+        res.status(ex.statusCode ? ex.statusCode : 500).json({ message: (ex.message ? ex.message : ex) });
     }
 });
 
