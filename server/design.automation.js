@@ -10,11 +10,12 @@ var router = express.Router();
 var bodyParser = require('body-parser');
 var jsonParser = bodyParser.json();
 var rawParser = bodyParser.raw({ limit: '10mb' });
-const rp = require('request-promise');
+const request = require('request');
+const requestPromise = require('request-promise');
 
 var config = require('./config');
 
-async function request(req, path, method, headers, body) {
+async function daRequest(req, path, method, headers, body) {
     headers = headers || {};
     if (!headers['Authorization']) {
         var tokenSession = new token(req.session);
@@ -31,12 +32,15 @@ async function request(req, path, method, headers, body) {
         headers: headers,
         json: true
     };
+
     if (body) {
         options.body = body;
     }
-    return await rp(options);
+    
+    return await requestPromise(options);
 }
 
+/*
 router.post('POST /buckets', jsonParser, function(req, res) {
     console.log('/buckets');
     var tokenSession = new token(req.session);
@@ -215,6 +219,8 @@ router.post('/chunks', rawParser, function(req, res) {
 
 });
 
+*/
+
 /////////////////////////////////////////////////////////////////
 // Items (AppBundles and Activities)
 /////////////////////////////////////////////////////////////////
@@ -231,8 +237,8 @@ function getFullName(nickName, name, alias) {
 }
 
 async function getItems(req, type, isPersonal) {
-    let response = await request(req, type, 'GET');
-    let nickname = await request(req, 'forgeapps/me', 'GET');
+    let response = await daRequest(req, type, 'GET');
+    let nickname = await daRequest(req, 'forgeapps/me', 'GET');
     let items = [];
 
     response.data.forEach((item, index) => {
@@ -254,19 +260,44 @@ async function getItems(req, type, isPersonal) {
 }
 
 async function getItem(req, type, id) {
-    let response = await request(req, `${type}/${id}`, 'GET');
+    let response = await daRequest(req, `${type}/${id}`, 'GET');
 
     return response;
 }
 
+async function uploadFile(inputUrl, uploadParameters) {
+    var downloadOptions = {
+        uri: inputUrl,
+        method: 'GET'
+    }
+
+    var uploadOptions = {
+        uri: uploadParameters.endpointURL,
+        method: 'POST',
+        headers: {
+            'Content-Type': 'multipart/form-data',
+            'Cache-Control': 'no-cache'
+        },
+        formData: uploadParameters.formData
+    }
+    uploadOptions.formData.file = request(downloadOptions);
+
+    await requestPromise(uploadOptions);
+}
+
 async function createItem(req, type, body) {
-    let response = await request(req, `${type}`, 'POST', null, body);
+    let response = await daRequest(req, `${type}`, 'POST', null, body);
+
+    // Upload the file from OSS
+    if (response.uploadParameters) {
+        await uploadFile(body.bundle, response.uploadParameters)
+    }
 
     return { response: 'done' };
 }
 
 async function deleteItem(req, type, id) {
-    await request(req, `${type}/${id}`, 'DELETE');
+    await daRequest(req, `${type}/${id}`, 'DELETE');
 
     return { response: 'done' };
 }
@@ -295,7 +326,7 @@ async function getItemVersions(req, type, id) {
     let page = '';
 
     while (true) {
-        let response = await request(req, `${type}/${id}/versions?${page}`, 'GET');
+        let response = await daRequest(req, `${type}/${id}/versions?${page}`, 'GET');
         response.data.map((item) => {
             versions.push({ id: item, children: false });
         })
@@ -309,14 +340,19 @@ async function getItemVersions(req, type, id) {
     return versions;
 }
 
-async function createItemVersion(req, type, id) {
-    let response = await request(req, `${type}/${id}/versions`, 'POST');
+async function createItemVersion(req, type, id, body) {
+    let response = await daRequest(req, `${type}/${id}/versions`, 'POST', null, body);
+
+    // Upload the file from OSS
+    if (response.uploadParameters) {
+        await uploadFile(body.bundle, response.uploadParameters)
+    }
 
     return response;
 }
 
 async function deleteItemVersion(req, type, id, version) {
-    await request(req, `${type}/${id}/versions/${version}`, 'DELETE');
+    await daRequest(req, `${type}/${id}/versions/${version}`, 'DELETE');
 
     return { response: 'done' };
 }
@@ -325,7 +361,7 @@ async function getItemAliases(req, type, id) {
     let aliases = [];
 
     while (true) {
-        let response = await request(req, `${type}/${id}/aliases`, 'GET');
+        let response = await daRequest(req, `${type}/${id}/aliases`, 'GET');
 
         aliases = aliases.concat(response.data);
 
@@ -349,7 +385,7 @@ function getAliasesForVersion(aliases, version) {
 }
 
 async function createItemAlias(req, type, id, version, alias) {
-    let response = await request(req, `${type}/${id}/aliases`, 'POST', null, {
+    let response = await daRequest(req, `${type}/${id}/aliases`, 'POST', null, {
         "version": parseInt(version), // has to be numeric
         "id": alias
     });
@@ -358,7 +394,7 @@ async function createItemAlias(req, type, id, version, alias) {
 }
 
 async function deleteItemAlias(req, type, id, alias) {
-    await request(req, `${type}/${id}/aliases/${alias}`, 'DELETE');
+    await daRequest(req, `${type}/${id}/aliases/${alias}`, 'DELETE');
 
     return { response: 'done' };
 }
@@ -436,7 +472,7 @@ router.get('/:type/info', async function(req, res) {
             console.log(info);
             res.json(info);
         } else {
-            // Bad Request
+            // Bad daRequest
             res.status(400).end();
         }
     } catch (ex) {
@@ -460,7 +496,7 @@ router.post('/:type', jsonParser, async function(req, res) {
             res.json(reply);
         } else if (level === 2) {
             // create version for item
-            var reply = await createItemVersion(req, type, paths[1]);
+            var reply = await createItemVersion(req, type, paths[1], req.body.body);
             res.json(reply);
         } else if (level === 3) {
             // create alias for version

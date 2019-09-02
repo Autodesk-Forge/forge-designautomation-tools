@@ -19,7 +19,7 @@ $(document).ready(function () {
         // adamnagy_2017_06_14
         var bucketName = $("#bucketName").val()
         var bucketType = $("#bucketType").val()
-        $.ajax ({
+        $.ajax({
             url: '/dm/buckets',
             type: 'POST',
             contentType: 'application/json',
@@ -28,14 +28,14 @@ $(document).ready(function () {
                 bucketName: bucketName,
                 bucketType: bucketType
             })
-        }).done (function (data) {
+        }).done(function (data) {
             console.log('Response' + data);
             showProgress("Bucket created", "success")
             $('#appBundlesTree').jstree(true).refresh()
-        }).fail (function (xhr, ajaxOptions, thrownError) {
+        }).fail(function (xhr, ajaxOptions, thrownError) {
             console.log('Bucket creation failed!')
             showProgress("Could not create bucket", "failed")
-        }) ;
+        });
     });
 
     // AppBundles
@@ -67,26 +67,26 @@ $(document).ready(function () {
     });
 
     function uuidv4() {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
             var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });
     }
 
-    function uploadChunks (file){
+    function uploadChunks(file) {
         var loaded = 0;
-        var step = 2 * 1024*1024; // 2 MB suggested
+        var step = 2 * 1024 * 1024; // 2 MB suggested
         var total = file.size;  // total size of file
         var start = 0;          // starting position
         var reader = new FileReader();
-        var blob = file.slice(start,step); //a single chunk in starting of step size
+        var blob = file.slice(start, step); //a single chunk in starting of step size
         reader.readAsArrayBuffer(blob);   // reading that chunk. when it read it, onload will be invoked
 
         var folderId = MyVars.selectedNode.id;
         var fileName = file.name;
         var sessionId = uuidv4();
 
-        reader.onload = function(e){
+        reader.onload = function (e) {
             //var d = {file:reader.result}
             var currentStart = start
             var currentEnd = start + e.loaded - 1;
@@ -96,8 +96,8 @@ $(document).ready(function () {
 
             console.log("uploadChunks >> ajax: sessionId = " + sessionId + ", range = " + range);
             $.ajax({
-                url:"/dm/chunks",
-                type:"POST",
+                url: "/dm/chunks",
+                type: "POST",
                 headers: {
                     'Content-Type': 'application/octet-stream',
                     'x-file-name': fileName,
@@ -106,15 +106,15 @@ $(document).ready(function () {
                     'range': range
                 },
                 processData: false,
-                data:res                     // d is the chunk got by readAsBinaryString(...)
-            }).done(function(r){           // if 'd' is uploaded successfully then ->
+                data: res                     // d is the chunk got by readAsBinaryString(...)
+            }).done(function (r) {           // if 'd' is uploaded successfully then ->
                 //$('.record_reply_g').html(r);   //updating status in html view
 
                 loaded += step;                 //increasing loaded which is being used as start position for next chunk
                 //$('.upload_rpogress').html((loaded/total) * 100);
 
-                if(loaded <= total){            // if file is not completely uploaded
-                    blob = file.slice(loaded,loaded+step);  // getting next chunk
+                if (loaded <= total) {            // if file is not completely uploaded
+                    blob = file.slice(loaded, loaded + step);  // getting next chunk
                     reader.readAsArrayBuffer(blob);        //reading it through file reader which will call onload again. So it will happen recursively until file is completely uploaded.
                 } else {                       // if file is uploaded completely
                     loaded = total;            // just changed loaded which could be used to show status.
@@ -124,7 +124,7 @@ $(document).ready(function () {
                     $("#forgeUploadHidden").val('');
                     $('#appBundlesTree').jstree(true).refresh()
                 }
-            }).fail (function (error) {
+            }).fail(function (error) {
                 console.log("uploadChunks >> fail");
                 showProgress("Upload failed", "failed");
                 $("#forgeUploadHidden").val('');
@@ -132,7 +132,7 @@ $(document).ready(function () {
         };
     }
 
-    $("#forgeUploadHidden").change(function(evt) {
+    $("#forgeUploadHidden").change(function (evt) {
 
         showProgress("Uploading file... ", "inprogress");
 
@@ -141,12 +141,12 @@ $(document).ready(function () {
         return;
 
 
-        var data = new FormData () ;
+        var data = new FormData();
         var fileName = this.value;
         var that = this
 
-        data.append (0, this.files[0]) ;
-        $.ajax ({
+        data.append(0, this.files[0]);
+        $.ajax({
             url: '/dm/files',
             type: 'POST',
             headers: { 'x-file-name': fileName, 'id': MyVars.selectedNode.id },
@@ -155,7 +155,7 @@ $(document).ready(function () {
             processData: false, // Don't process the files
             contentType: false, // Set content type to false as jQuery will tell the server its a query string request
             complete: null
-        }).done (function (data) {
+        }).done(function (data) {
             console.log('Uploaded file "' + data.fileName + '" with urn = ' + data.objectId);
 
             showProgress("File uploaded", "success");
@@ -163,13 +163,13 @@ $(document).ready(function () {
 
             // Clear selected files list
             that.value = ""
-        }).fail (function (xhr, ajaxOptions, thrownError) {
-            console.log(fileName + ' upload failed!') ;
+        }).fail(function (xhr, ajaxOptions, thrownError) {
+            console.log(fileName + ' upload failed!');
             showProgress("Upload failed", "failed");
-        }) ;
+        });
     });
 
-    var upload = $("#uploadFile").click(function(evt) {
+    var upload = $("#uploadFile").click(function (evt) {
         evt.preventDefault();
         $("#forgeUploadHidden").trigger("click");
     });
@@ -177,7 +177,7 @@ $(document).ready(function () {
     var auth = $("#authenticate")
     auth.click(function () {
         // Get the tokens
-        get2LegToken(function(token) {
+        get2LegToken(function (token) {
             var auth = $("#authenticate");
 
             MyVars.token2Leg = token;
@@ -190,7 +190,7 @@ $(document).ready(function () {
         });
     });
 
-    $('#progressInfo').click(function() {
+    $('#progressInfo').click(function () {
         MyVars.keepTrying = false;
         showProgress("Translation stopped", 'failed');
     });
@@ -244,7 +244,7 @@ function get2LegToken(callback) {
                 callback(data.token, data.expires_in);
                 showProgress()
             },
-            error: function(err, text) {
+            error: function (err, text) {
                 showProgress(err.responseText, 'failed');
             }
         });
@@ -335,6 +335,88 @@ function deleteItem(type) {
     });
 }
 
+function createAppbundle(request, data, node, id) {
+    var endpoint = 'appbundles'
+
+    var inputs = {
+        'engine': {
+            'text': 'Engine',
+            'value': 'e.g. Autodesk.Inventor+23'
+        },
+        'description': {
+            'text': 'Description',
+            'value': 'Describe the app bundle'
+        },
+        'bundle': {
+            'text': 'App Bundle',
+            'value': 'URL of the appbundle'
+        }
+    };
+
+    if (!id) {
+        inputs.id = {
+            'text': 'Id',
+            'value': 'e.g. MyChangeParams'
+        }
+
+        //endpoint += `\${id}\versions`
+    }
+
+    var alias = getInputs('Info', inputs, () => {
+        data.body = {};
+        Object.keys(inputs).forEach(function (key) {
+            data.body[key] = inputs[key].value;
+        });
+
+        request(endpoint, data, node);
+    });
+}
+
+function createActivity(request, data, node, id) {
+    var endpoint = 'activities'
+
+    var inputs = {
+        'commandline': {
+            'text': 'Command line',
+            'value': 'e.g. $(engine.path)\\InventorCoreConsole.exe /i $(args[InventorDoc].path) /al $(appbundles[ChangeParams].path) $(args[InventorParams].path)'
+        },
+        'parameters': {
+            'text': 'Parameters',
+            'value': 'List of parameters to use'
+        },
+        'engine': {
+            'text': 'Engine',
+            'value': 'e.g. Autodesk.Inventor+23'
+        },
+        'appbundles': {
+            'text': 'App Bundles',
+            'value': 'List of appbundles to use'
+        },
+        'description': {
+            'text': 'Description',
+            'value': 'Describe the activity'
+        }
+    };
+
+    if (!id) {
+        inputs.id = {
+            'text': 'Id',
+            'value': 'e.g. MyChangeParams'
+        }
+
+        //endpoint += `\${id}\versions`
+    }
+
+    var alias = getInputs('Info', inputs, () => {
+        data.body = {};
+        Object.keys(inputs).forEach(function (key) {
+            data.body[key] = inputs[key].value;
+        });
+
+        request(endpoint, data, node);
+    });
+}
+
 function createItem(type) {
     var nodeId = $(`#${type}Tree`).jstree('get_selected');
     var node = $(`#${type}Tree`).jstree(true).get_node(nodeId);
@@ -354,9 +436,9 @@ function createItem(type) {
             contentType: 'application/json',
             success: function (data) {
                 $(`#${type}Info`).val(JSON.stringify(data, null, 2));
-                
+
                 // Refresh the node's chidren 
-                $(`#${type}Tree`).jstree(true).refresh_node(node.id); 
+                $(`#${type}Tree`).jstree(true).refresh_node(node.id);
             },
             error: function (err) {
                 $(`#${type}Info`).val(JSON.stringify(err.responseJSON, null, 2));
@@ -366,7 +448,7 @@ function createItem(type) {
 
     if (node.type === 'version') {
         // get alias name from user
-        var inputs = { 
+        var inputs = {
             'alias': {
                 'text': 'Alias name',
                 'placeholder': 'Alias name',
@@ -378,29 +460,24 @@ function createItem(type) {
             request(type, data, node);
         });
     } else if (node.type === 'folder') {
-        // get alias name from user
-        var inputs = { 
-            'engine': {
-                'text': 'Engine',
-                'value': 'e.g. Autodesk.Inventor+23'
-            },
-            'description': {
-                'text': 'Description',
-                'value': 'Describe the app bundle'
-            },
-            'id': {
-                'text': 'Id',
-                'value': 'e.g. MyChangeParams'
-            }
-        };
-        var alias = getInputs('Info', inputs, () => {
-            data.body = {};
-            Object.keys(inputs).forEach(function (key) {
-                data.body[key] = inputs[key].value;
-            });
+        if (node.id !== 'Personal')
+            return;
 
-            request(type, data, node);
-        });
+        if (type === 'appbundles') {
+            createAppbundle(request, data, node);
+        } else if (type === 'activities') {
+            createActivity(request, data, node);
+        }
+    } else if (node.type === 'item') {
+
+        if (node.id.startsWith('Shared'))
+            return;
+
+        if (type === 'appbundles') {
+            createAppbundle(request, data, node, node.text);
+        } else if (type === 'activities') {
+            createActivity(request, data, node, node.text);
+        }
     } else {
         request(type, data, node);
     }
@@ -468,19 +545,30 @@ function getInputs(title, inputs, callback) {
     let body = '';
     Object.keys(inputs).forEach(function (key) {
         let input = inputs[key];
-        body += 
-            `<div class="input-group mb-3">
+        if (input.file !== undefined) {
+            body +=
+                `<div class="input-group mb-3">
                 <div class="input-group-addon">
                     <span class="input-group-text" id="${modelDialog}_${key}_prepend">${input.text}</span>
                 </div>
-                <input id="${modelDialog}_${key}" type="text" class="form-control" placeholder="${input.value}" aria-label="${modelDialog}_${key}" aria-describedby="${modelDialog}_${key}_prepend">
+                <input id="${modelDialog}_${key}" type="file" accept=".zip" class="form-control" aria-label="${modelDialog}_${key}" aria-describedby="${modelDialog}_${key}_prepend" />
             </div>`;
+        } else {
+            body +=
+                `<div class="input-group mb-3">
+                <div class="input-group-addon">
+                    <span class="input-group-text" id="${modelDialog}_${key}_prepend">${input.text}</span>
+                </div>
+                <input id="${modelDialog}_${key}" type="text" class="form-control" placeholder="${input.value}" aria-label="${modelDialog}_${key}" aria-describedby="${modelDialog}_${key}_prepend" />
+            </div>`;
+        }
+
     })
 
     $('#myModal_body').html(body);
 
-    var onClose = function () {
-        $('#myModal').off('hidden.bs.modal', onClose);
+    var onCreate = function () {
+        $('#myModal_Create').off('click', onCreate);
 
         // Update values
         Object.keys(inputs).forEach(function (key) {
@@ -488,10 +576,12 @@ function getInputs(title, inputs, callback) {
             input.value = $(`#${modelDialog}_${key}`).val();
         })
 
+        $('#myModal').modal('hide');
+
         callback();
     }
 
-    $('#myModal').on('hidden.bs.modal', onClose);
+    $('#myModal_Create').on('click', onCreate);
 
     $('#myModal').modal();
 }
@@ -547,7 +637,7 @@ MyVars.getAllProps = async function () {
             });
         });
     };
-    
+
     var getPropsRec = async function (id, propNode) {
         var props = await getProps(id, propNode);
         handled.push(props.dbId);
@@ -557,17 +647,17 @@ MyVars.getAllProps = async function () {
             var prop = props.properties[key];
             // Avoid circular reference by checking if it's been
             // handled already
-            if (prop.type === 11 && ! handled.includes(prop.displayValue)) {
+            if (prop.type === 11 && !handled.includes(prop.displayValue)) {
                 await getPropsRec(prop.displayValue, propNode['child_' + props.dbId]);
             }
         };
     }
-    
+
     await getPropsRec(NOP_VIEWER.model.getRootId(), propTree);
     console.log(propTree);
 }
 
-function getActiveConfigurationProperties (viewer) {
+function getActiveConfigurationProperties(viewer) {
     var dbIds = viewer.getSelection();
 
     if (dbIds.length !== 1) {
@@ -579,8 +669,8 @@ function getActiveConfigurationProperties (viewer) {
         props.properties.forEach(prop => {
             if (prop.displayName === "Active Configuration") {
                 viewer.getProperties(prop.displayValue, confProps => {
-                    console.log(confProps);        
-                });  
+                    console.log(confProps);
+                });
 
                 return;
             }
@@ -638,7 +728,7 @@ PropertyInspectorExtension.prototype.createUI = function () {
         // show/hide docking panel
         panel.setVisible(!panel.isVisible());
     };
-    
+
     toolbarButtonShowDockingPanel.addClass('propertyInspectorToolbarButton');
     toolbarButtonShowDockingPanel.setToolTip('Property Inspector Panel');
 
@@ -660,7 +750,7 @@ Autodesk.Viewing.theExtensionManager.registerExtension('PropertyInspectorExtensi
 // Property Inspector Extension
 // *******************************************
 
-function PropertyInspectorPanel (viewer, container, id, title, options) {
+function PropertyInspectorPanel(viewer, container, id, title, options) {
     this.viewer = viewer;
     this.breadcrumbsItems = [];
     Autodesk.Viewing.UI.PropertyPanel.call(this, container, id, title, options);
@@ -668,7 +758,7 @@ function PropertyInspectorPanel (viewer, container, id, title, options) {
     this.showBreadcrumbs = function () {
         // Create it if not there yet
         if (!this.breadcrumbs) {
-            this.breadcrumbs = document.createElement('span');   
+            this.breadcrumbs = document.createElement('span');
             this.title.appendChild(this.breadcrumbs);
         } else {
             while (this.breadcrumbs.firstChild) {
@@ -683,7 +773,7 @@ function PropertyInspectorPanel (viewer, container, id, title, options) {
                 var text = document.createTextNode(' > ');
                 this.breadcrumbs.appendChild(text);
             }
-            
+
             var type = document.createElement('a');
             type.innerText = dbId;
             type.style.cursor = "pointer";
@@ -737,12 +827,12 @@ function PropertyInspectorPanel (viewer, container, id, title, options) {
             dbId = this.viewer.model.getRootId();
         }
 
-        this.breadcrumbsItems = [];   
+        this.breadcrumbsItems = [];
         this.showProperties(dbId);
     } // onSelectionChanged
 
     viewer.addEventListener(
-        Autodesk.Viewing.SELECTION_CHANGED_EVENT, 
+        Autodesk.Viewing.SELECTION_CHANGED_EVENT,
         this.onSelectionChanged.bind(this)
     );
 }; // PropertyInspectorPanel
