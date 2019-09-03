@@ -122,8 +122,29 @@
                                     </a>
                                 </div>
                             </div>
-                            <div class="tab-pane fade" id="pills-workitems" role="tabpanel" aria-labelledby="pills-workitems-tab">
+                            <div class="tab-pane" id="pills-workitems" role="tabpanel" aria-labelledby="pills-workitems-tab">
+                                <div class="col-sm-4">
+                                    <div id="workitemsTree" class="form-control">
 
+                                    </div>
+                                    <a id="workitemsTree_refresh" style="display: inline-block; margin-top: 5px;"
+                                        class="btn btn-default">
+                                        <span class="glyphicon glyphicon-refresh"></span>
+                                    </a>
+                                    <a id="workitemsTree_add" style="display: inline-block; margin-top: 5px;" class="btn btn-default">
+                                        <span class="glyphicon glyphicon-plus"></span>
+                                    </a>
+                                    <a id="workitemsTree_delete" style="display: inline-block; margin-top: 5px;" class="btn btn-default">
+                                        <span class="glyphicon glyphicon-trash"></span>
+                                    </a>
+                                </div>
+
+                                <div class="col-sm-8">
+                                    <textarea id="workitemsInfo" class="form-control" rows="3"></textarea>
+                                    <a id="workitemsInfo_paste" style="display: inline-block; margin-top: 5px;" class="btn btn-default">
+                                        <span class="glyphicon glyphicon-paste"></span>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>

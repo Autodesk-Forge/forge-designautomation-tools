@@ -1,5 +1,6 @@
 var MyVars = {
-    keepTrying: true
+    keepTrying: true,
+    options: {}
 };
 
 $(document).ready(function () {
@@ -187,6 +188,7 @@ $(document).ready(function () {
             // Fill the tree AppBundle and Activity items
             prepareItemsTree('appbundles');
             prepareItemsTree('activities');
+            prepareWorkitemsTree('workitems');
         });
     });
 
@@ -341,22 +343,32 @@ function createAppbundle(request, data, node, id) {
     var inputs = {
         'engine': {
             'text': 'Engine',
-            'value': 'e.g. Autodesk.Inventor+23'
+            'placeholder': 'e.g. Autodesk.Inventor+23',
+            'value': '',
+            'options': {
+                'Inventor': 'Autodesk.Inventor+23',
+                'AutoCAD': 'Autodesk.AutoCAD+23',
+                'Revit': 'Autodesk.Revit+23',
+                '3dsMax': 'Autodesk.3dsMax+23'
+            }
         },
         'description': {
             'text': 'Description',
-            'value': 'Describe the app bundle'
+            'placeholder': 'Describe the app bundle',
+            'value': ''
         },
         'bundle': {
             'text': 'App Bundle',
-            'value': 'URL of the appbundle'
+            'placeholder': 'URL of the appbundle',
+            'value': ''
         }
     };
 
     if (!id) {
         inputs.id = {
             'text': 'Id',
-            'value': 'e.g. MyChangeParams'
+            'placeholder': 'e.g. MyAppBundle',
+            'value': ''
         }
 
         //endpoint += `\${id}\versions`
@@ -376,32 +388,71 @@ function createActivity(request, data, node, id) {
     var endpoint = 'activities'
 
     var inputs = {
-        'commandline': {
+        'commandLine': {
             'text': 'Command line',
-            'value': 'e.g. $(engine.path)\\InventorCoreConsole.exe /i $(args[InventorDoc].path) /al $(appbundles[ChangeParams].path) $(args[InventorParams].path)'
+            'placeholder': 'e.g. $(engine.path)\\InventorCoreConsole.exe /i $(args[inputFile].path) /al $(appbundles[ChangeParams].path) $(args[InventorParams].path)',
+            'value': '',
+            'options': {
+                'Inventor': '$(engine.path)\\InventorCoreConsole.exe /i $(args[inputFile].path) /al $(appbundles[<appbundlename>].path)',
+                'AutoCAD': '$(engine.path)\\accoreconsole.exe /i $(args[inputFile].path) /al $(appbundles[<appbundlename>].path) /s $(settings[script].path)',
+                'Revit': '$(engine.path)\\revitcoreconsole.exe /i $(args[inputFile].path) /al $(appbundles[<appbundlename>].path)',
+                '3dsMax': '$(engine.path)\\3dsmaxbatch.exe -sceneFile $(args[inputFile].path) $(settings[script].path)'
+            }
         },
         'parameters': {
             'text': 'Parameters',
-            'value': 'List of parameters to use'
+            'placeholder': 'List of parameters to use',
+            'value': '',
+            'multiline': true,
+            'options': {
+                'Input / Output': '{ \n' +
+                    '  "inputFile": { \n' +
+                    '    "verb": "get" \n' +
+                    '  }, \n' +
+                    '  "inputJson": { \n' +
+                    '    "verb": "get", \n' +
+                    '    "localName": "params.json" \n' +
+                    '  }, \n' +
+                    '  "outputFile": { \n' +
+                    '    "verb": "put", \n' +
+                    '    "localName": "outputFile.ipt" \n' +
+                    '  } \n' +
+                    '}'
+            },
+            'json': true
         },
         'engine': {
             'text': 'Engine',
-            'value': 'e.g. Autodesk.Inventor+23'
+            'placeholder': 'e.g. Autodesk.Inventor+23',
+            'value': '',
+            'options': {
+                'Inventor': 'Autodesk.Inventor+23',
+                'AutoCAD': 'Autodesk.AutoCAD+23',
+                'Revit': 'Autodesk.Revit+23',
+                '3dsMax': 'Autodesk.3dsMax+23'
+            }
         },
         'appbundles': {
             'text': 'App Bundles',
-            'value': 'List of appbundles to use'
+            'placeholder': 'List of fully qualified names of appbundles to use: [&#34;MyNickName.MyAppBundle+MyAlias&#34;]',
+            'value': '',
+            'options': {
+                'Default': '["<nickname>.<appbundlename>+<alias>"]'
+            },
+            'json': true
         },
         'description': {
             'text': 'Description',
-            'value': 'Describe the activity'
+            'placeholder': 'Describe the activity',
+            'value': ''
         }
     };
 
     if (!id) {
         inputs.id = {
             'text': 'Id',
-            'value': 'e.g. MyChangeParams'
+            'placeholder': 'e.g. MyActivity',
+            'value': ''
         }
 
         //endpoint += `\${id}\versions`
@@ -411,10 +462,62 @@ function createActivity(request, data, node, id) {
         data.body = {};
         Object.keys(inputs).forEach(function (key) {
             data.body[key] = inputs[key].value;
+            if (inputs[key].json) {
+                data.body[key] = JSON.parse(data.body[key])
+            }
         });
 
         request(endpoint, data, node);
     });
+}
+
+function createWorkitem(request, data, node, id) {
+    var endpoint = 'workitems'
+
+    // Get data from activitiesInfo to find out the parameters that
+    // need to be passed as arguments
+    var info = $('#activitiesInfo').val();
+
+    var json = JSON.parse(info);
+
+    if (json.parameters) {
+        for (let paramKey in json.parameters) {
+            let param = json.parameters[paramKey]
+            param.url = ""
+        }
+
+        var inputs = {
+            'arguments': {
+                'text': 'Arguments',
+                'value': JSON.stringify(json.parameters, null, 2),
+                'multiline': true,
+                'json': true
+            }
+        };
+
+        var alias = getInputs('Info', inputs, () => {
+            data.body = {};
+            Object.keys(inputs).forEach(function (key) {
+                data.body[key] = inputs[key].value;
+                if (inputs[key].json) {
+                    data.body[key] = JSON.parse(data.body[key])
+                }
+            });
+            data.body.activityId = json.id
+
+            // Switch to the Workitems tab
+            $('#pills-workitems-tab').tab('show');
+
+            request(endpoint, data, node, (response) => {
+                // add workitem to the list
+                console.log(response);
+
+                $('#workitemsTree').jstree().create_node('#' ,  { "id" : response.id, "text" : response.id }, "last", function(){
+                    alert("done");
+                })
+            });
+        });
+    }
 }
 
 function createItem(type) {
@@ -427,7 +530,7 @@ function createItem(type) {
         alias: node.original.alias
     }
 
-    let request = function (type, data, node) {
+    let request = function (type, data, node, callback) {
         $.ajax({
             url: `/da/${type}`,
             type: 'POST',
@@ -438,7 +541,12 @@ function createItem(type) {
                 $(`#${type}Info`).val(JSON.stringify(data, null, 2));
 
                 // Refresh the node's chidren 
-                $(`#${type}Tree`).jstree(true).refresh_node(node.id);
+                if (type !== 'workitems')
+                    $(`#${type}Tree`).jstree(true).refresh_node(node.id);
+
+                if (callback) {
+                    callback(data)
+                }
             },
             error: function (err) {
                 $(`#${type}Info`).val(JSON.stringify(err.responseJSON, null, 2));
@@ -451,8 +559,8 @@ function createItem(type) {
         var inputs = {
             'alias': {
                 'text': 'Alias name',
-                'placeholder': 'Alias name',
-                'value': 'e.g. v12'
+                'placeholder': 'e.g. v12',
+                'value': ''
             }
         };
         var alias = getInputs('Info', inputs, () => {
@@ -477,6 +585,10 @@ function createItem(type) {
             createAppbundle(request, data, node, node.text);
         } else if (type === 'activities') {
             createActivity(request, data, node, node.text);
+        }
+    } else if (node.type === 'alias') {
+        if (type === 'activities') {
+            createWorkitem(request, data, node, node.text)
         }
     } else {
         request(type, data, node);
@@ -522,8 +634,11 @@ function prepareItemsTree(type) {
         "plugins": ["types"] // let's not use sort or state: , "state" and "sort"],
     }).bind("select_node.jstree", function (evt, data) {
         console.log("select_node.jstree");
-
         let node = data.node;
+
+        let addButton = $(`#${type}Tree_add`).find('span')
+        addButton.attr("class", (node.type === 'alias') ? "glyphicon glyphicon-play" : "glyphicon glyphicon-plus")
+
         if (node.type === 'alias') {
             var itemNode = $(`#${type}Tree`).jstree(true).get_node(node.parents[1]);
             showItemsInfo(node.id, itemNode.original.nickName, itemNode.original.alias, type);
@@ -535,37 +650,105 @@ function prepareItemsTree(type) {
         }
     });
 }
+function fillWithValue(id, optionKey) {
+    let options = MyVars.options[id]
+    let option = options[optionKey];
+    $(`#${id}`).val(option);
+}
+
+function prepareWorkitemsTree(type) {
+    console.log("prepareWorkitemsTree");
+    $(`#${type}Tree`).jstree({
+        'core': {
+            'themes': { "icons": true },
+            "check_callback" : true,
+            'data': []
+        },
+        "ui": {
+            "select_limit": 1
+        },
+        'types': {
+            'default': {
+                'icon': 'glyphicon glyphicon-play-circle'
+            }
+        },
+        "plugins": ["types"] // let's not use sort or state: , "state" and "sort"],
+    }).bind("select_node.jstree", function (evt, data) {
+        console.log("select_node.jstree");
+
+        let node = data.node;
+        showItemsInfo(node.id, '', '', type);
+    });
+}
 
 // 'inputs' is an array of objects with 'text', 'placeholder' and 'value' parameters 
 function getInputs(title, inputs, callback) {
-    const modelDialog = 'myModal';
+    const modelDialog = 'myModal'
 
-    $('#myModal_title').html(title);
+    $('#myModal_title').html(title)
+    $('#myModal_body').html('')
 
-    let body = '';
     Object.keys(inputs).forEach(function (key) {
+        let inputGroup = $('<div class="input-group mb-3">');
+        //inputGroup.addClass('input-group mb-3');
+
         let input = inputs[key];
+
         if (input.file !== undefined) {
-            body +=
-                `<div class="input-group mb-3">
+            inputGroup.html(`
                 <div class="input-group-addon">
                     <span class="input-group-text" id="${modelDialog}_${key}_prepend">${input.text}</span>
                 </div>
                 <input id="${modelDialog}_${key}" type="file" accept=".zip" class="form-control" aria-label="${modelDialog}_${key}" aria-describedby="${modelDialog}_${key}_prepend" />
-            </div>`;
-        } else {
-            body +=
-                `<div class="input-group mb-3">
+                `)
+        } else if (input.multiline) {
+            inputGroup.html(`
                 <div class="input-group-addon">
                     <span class="input-group-text" id="${modelDialog}_${key}_prepend">${input.text}</span>
                 </div>
-                <input id="${modelDialog}_${key}" type="text" class="form-control" placeholder="${input.value}" aria-label="${modelDialog}_${key}" aria-describedby="${modelDialog}_${key}_prepend" />
-            </div>`;
+                `)
+            let textarea = $(`<textarea id="${modelDialog}_${key}" type="text" class="form-control" placeholder="${input.placeholder}" aria-label="${modelDialog}_${key}" aria-describedby="${modelDialog}_${key}_prepend" />`)
+            textarea.val(`${input.value}`)
+            inputGroup.append(textarea)
+        } else {
+            inputGroup.html(`
+                <div class="input-group-addon">
+                    <span class="input-group-text" id="${modelDialog}_${key}_prepend">${input.text}</span>
+                </div>
+                <input id="${modelDialog}_${key}" type="text" class="form-control" placeholder="${input.placeholder}" aria-label="${modelDialog}_${key}" aria-describedby="${modelDialog}_${key}_prepend" value="${input.value}" />
+                `)
         }
 
-    })
+        if (input.options) {
+            MyVars.options[`${modelDialog}_${key}`] = input.options
 
-    $('#myModal_body').html(body);
+            let dropdownSection = $('<div class="input-group-btn">')
+            
+            let dropdownGroup = $('<div class="dropdown btn-group" role="group">')
+            dropdownGroup.html(`
+                <button class="btn btn-default dropdown-toggle" type="button" id="${modelDialog}_${key}_dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    <span class="caret"></span>
+                </button>
+                `)
+            dropdownSection.append(dropdownGroup)
+
+            let dropdownMenu = $(`<ul class="dropdown-menu" aria-labelled-by="${modelDialog}_${key}_dropdown">`);
+            for (let optionKey in input.options) {
+                let listItem = $('<li>')
+                let href = $(`<a href="#">${optionKey}</a>`)
+                href.click(() => {
+                    fillWithValue(`${modelDialog}_${key}`, `${optionKey}`)
+                })
+                listItem.append(href)
+                dropdownMenu.append(listItem)
+            }
+            dropdownGroup.append(dropdownMenu)
+
+            inputGroup.append(dropdownSection)
+        }
+
+        $('#myModal_body').append(inputGroup)
+    })
 
     var onCreate = function () {
         $('#myModal_Create').off('click', onCreate);

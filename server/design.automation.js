@@ -290,14 +290,16 @@ async function createItem(req, type, body) {
 
     // Upload the file from OSS
     if (response.uploadParameters) {
-        await uploadFile(body.bundle, response.uploadParameters)
+        try {
+            await uploadFile(body.bundle, response.uploadParameters)
+        } catch { }
     }
 
-    return { response: 'done' };
+    return response;
 }
 
 async function deleteItem(req, type, id) {
-    await daRequest(req, `${type}/${id}`, 'DELETE');
+    let response = await daRequest(req, `${type}/${id}`, 'DELETE');
 
     return { response: 'done' };
 }
@@ -345,14 +347,16 @@ async function createItemVersion(req, type, id, body) {
 
     // Upload the file from OSS
     if (response.uploadParameters) {
-        await uploadFile(body.bundle, response.uploadParameters)
+        try {
+            await uploadFile(body.bundle, response.uploadParameters)
+        } catch { }
     }
 
     return response;
 }
 
 async function deleteItemVersion(req, type, id, version) {
-    await daRequest(req, `${type}/${id}/versions/${version}`, 'DELETE');
+    let response = await daRequest(req, `${type}/${id}/versions/${version}`, 'DELETE');
 
     return { response: 'done' };
 }
@@ -394,9 +398,9 @@ async function createItemAlias(req, type, id, version, alias) {
 }
 
 async function deleteItemAlias(req, type, id, alias) {
-    await daRequest(req, `${type}/${id}/aliases/${alias}`, 'DELETE');
+    let response = await daRequest(req, `${type}/${id}/aliases/${alias}`, 'DELETE');
 
-    return { response: 'done' };
+    return response;
 }
 
 router.get('/:type/treeNode', async function(req, res) {
@@ -451,7 +455,11 @@ router.get('/:type/info', async function(req, res) {
         var paths = id.split('/');
         var level = paths.length;
 
-        if (level === 2) {
+        if (level === 1) {
+            var info = await getItem(req, type, id);
+            console.log(info);
+            res.json(info);
+        } else if (level === 2) {
             // item
             if (paths[0] === 'Shared') {
                 var nickName = req.query.nickName;
@@ -501,6 +509,10 @@ router.post('/:type', jsonParser, async function(req, res) {
         } else if (level === 3) {
             // create alias for version
             var reply = await createItemAlias(req, type, paths[1], paths[2], req.body.alias);
+            res.json(reply);
+        } else {
+            // create workitem
+            var reply = await createItem(req, type, req.body.body);
             res.json(reply);
         }
     } catch (ex) {

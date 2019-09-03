@@ -8,6 +8,12 @@
     background-color: #fff;
 }
 
+.dropdown-menu {
+    /*position: static*/
+    left: 40px;
+    top: 0px;
+}
+
 
 
 
@@ -45,7 +51,7 @@
     border-top-width: 1px; border-top-color: silver; border-top-style: solid;
     overflow: hidden;
 }
-#appbundlesTree, #appbundlesInfo, #activitiesTree, #activitiesInfo {
+#appbundlesTree, #appbundlesInfo, #activitiesTree, #activitiesInfo, #workitemsTree, #workitemsInfo {
     height: 363px;
     overflow: auto;
 }
