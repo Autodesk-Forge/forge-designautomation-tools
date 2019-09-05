@@ -463,7 +463,11 @@ function createActivity(request, data, node, id) {
         Object.keys(inputs).forEach(function (key) {
             data.body[key] = inputs[key].value;
             if (inputs[key].json) {
-                data.body[key] = JSON.parse(data.body[key])
+                try {
+                    data.body[key] = JSON.parse(data.body[key])
+                } catch {
+                    alert(`Error parsing ${key} parameter`)
+                }
             }
         });
 
@@ -500,7 +504,11 @@ function createWorkitem(request, data, node, id) {
             Object.keys(inputs).forEach(function (key) {
                 data.body[key] = inputs[key].value;
                 if (inputs[key].json) {
-                    data.body[key] = JSON.parse(data.body[key])
+                    try {
+                        data.body[key] = JSON.parse(data.body[key])
+                    } catch {
+                        alert(`Error parsing ${key} parameter`)
+                    }
                 }
             });
             data.body.activityId = json.id
@@ -648,10 +656,21 @@ function prepareItemsTree(type) {
         }
     });
 }
+
 function fillWithValue(id, optionKey) {
     let options = MyVars.options[id]
     let option = options[optionKey];
     $(`#${id}`).val(option);
+}
+
+function verifyJson(id) {
+    let text = $(`#${id}`).val();
+    try {
+        let json = JSON.parse(text);
+        alert("Content is valid json string")
+    } catch (err) {
+        alert("Problem with content: " + err)
+    }
 }
 
 function prepareWorkitemsTree(type) {
@@ -736,6 +755,18 @@ function getInputs(title, inputs, callback) {
                 let href = $(`<a href="#">${optionKey}</a>`)
                 href.click(() => {
                     fillWithValue(`${modelDialog}_${key}`, `${optionKey}`)
+                })
+                listItem.append(href)
+                dropdownMenu.append(listItem)
+            }
+            if (input.json) {
+                let separator = $('<li role="separator" class="divider"></li>')
+                dropdownMenu.append(separator)
+
+                let listItem = $('<li>')
+                let href = $(`<a href="#">Verify json</a>`)
+                href.click(() => {
+                    verifyJson(`${modelDialog}_${key}`)
                 })
                 listItem.append(href)
                 dropdownMenu.append(listItem)
