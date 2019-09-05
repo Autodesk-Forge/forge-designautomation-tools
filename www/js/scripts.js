@@ -736,7 +736,7 @@ function getInputs(title, inputs, callback) {
                 `)
         }
 
-        if (input.options) {
+        if (input.options || input.json) {
             MyVars.options[`${modelDialog}_${key}`] = input.options
 
             let dropdownSection = $('<div class="input-group-btn">')
