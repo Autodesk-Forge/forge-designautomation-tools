@@ -400,7 +400,7 @@ async function createItemAlias(req, type, id, version, alias) {
 async function deleteItemAlias(req, type, id, alias) {
     let response = await daRequest(req, `${type}/${id}/aliases/${alias}`, 'DELETE');
 
-    return response;
+    return { response: 'done' };
 }
 
 router.get('/:type/treeNode', async function(req, res) {

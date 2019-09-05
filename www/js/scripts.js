@@ -512,9 +512,7 @@ function createWorkitem(request, data, node, id) {
                 // add workitem to the list
                 console.log(response);
 
-                $('#workitemsTree').jstree().create_node('#' ,  { "id" : response.id, "text" : response.id }, "last", function(){
-                    alert("done");
-                })
+                $('#workitemsTree').jstree().create_node('#' ,  { "id" : response.id, "text" : response.id }, "last")
             });
         });
     }
