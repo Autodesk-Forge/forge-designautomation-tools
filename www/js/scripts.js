@@ -50,7 +50,7 @@ $(document).ready(function () {
     });
 
     $("#appbundlesTree_delete").click(function (evt) {
-        deleteItem('appbundles');
+        deleteItem('appbundles', true);
     });
 
     // Activities
@@ -64,7 +64,24 @@ $(document).ready(function () {
     });
 
     $("#activitiesTree_delete").click(function (evt) {
-        deleteItem('activities');
+        deleteItem('activities', true);
+    });
+
+    // Workitems
+
+    $("#workitemsTree_stop").click(function (evt) {
+        deleteItem('workitems', false);
+    });
+
+    $("#workitemsTree_delete").click(function (evt) {
+        var tree = $('#workitemsTree')
+        var nodeId = tree.jstree('get_selected');
+        if (nodeId.length < 1)
+            return
+
+        var nextNode = tree.jstree().get_next_dom(nodeId);
+        tree.jstree().delete_node([nodeId]);
+        tree.jstree('select_node', nextNode);
     });
 
     function uuidv4() {
@@ -312,9 +329,13 @@ function showItemsInfo(id, nickName, alias, type) {
     });
 }
 
-function deleteItem(type) {
-    var nodeId = $(`#${type}Tree`).jstree('get_selected');
-    var node = $(`#${type}Tree`).jstree(true).get_node(nodeId);
+function deleteItem(type, removeNode) {
+    var tree = $(`#${type}Tree`)
+    var nodeId = tree.jstree('get_selected');
+    if (nodeId.length < 1)
+        return
+
+    var node = tree.jstree(true).get_node(nodeId);
     $.ajax({
         url: `/da/${type}/${encodeURIComponent(node.id)}`,
         type: 'DELETE',
@@ -327,9 +348,11 @@ function deleteItem(type) {
 
             // Remove node
             //var parent = $(`#${type}Tree`).jstree().get_node(node.parent);
-            var nextNode = $(`#${type}Tree`).jstree().get_next_dom(node.id);
-            $(`#${type}Tree`).jstree().delete_node([node.id]);
-            $(`#${type}Tree`).jstree('select_node', nextNode);
+            if (removeNode) {
+                var nextNode = tree.jstree().get_next_dom(node.id);
+                tree.jstree().delete_node([node.id]);
+                tree.jstree('select_node', nextNode);
+            }
         },
         error: function (err) {
             $(`#${type}Info`).val(JSON.stringify(err.responseJSON, null, 2));
@@ -528,6 +551,9 @@ function createWorkitem(request, data, node, id) {
 
 function createItem(type) {
     var nodeId = $(`#${type}Tree`).jstree('get_selected');
+    if (nodeId.length < 1)
+        return
+
     var node = $(`#${type}Tree`).jstree(true).get_node(nodeId);
 
     var data = {
