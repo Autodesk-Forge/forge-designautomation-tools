@@ -531,7 +531,11 @@ router.delete('/:type/:id', async function(req, res) {
         var paths = id.split('/');
         var level = paths.length;
 
-        if (level === 2) {
+        if (level === 1) {
+            // item
+            var reply = await deleteItem(req, type, paths[0]);
+            res.json(reply);
+        } else if (level === 2) {
             // item
             var reply = await deleteItem(req, type, paths[1]);
             res.json(reply);
