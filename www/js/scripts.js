@@ -69,6 +69,20 @@ $(document).ready(function () {
 
     // Workitems
 
+    $("#workitemsTree_add").click(function (evt) {
+        var inputs = {
+            'id': {
+                'text': 'WorkItem id',
+                'placeholder': '<id of an existing WorkItem>',
+                'value': ''
+            }
+        };    
+
+        var alias = getInputs('Info', inputs, () => {
+            $('#workitemsTree').jstree().create_node('#' ,  { "id" : inputs.id.value, "text" : inputs.id.value }, "last")
+        });    
+    });
+
     $("#workitemsTree_stop").click(function (evt) {
         deleteItem('workitems', false);
     });
