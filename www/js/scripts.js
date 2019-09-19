@@ -740,6 +740,7 @@ function prepareWorkitemsTree(type) {
 
 // 'inputs' is an array of objects with 'text', 'placeholder' and 'value' parameters 
 function getInputs(title, inputs, callback) {
+    console.log('getInputs');
     const modelDialog = 'myModal'
 
     $('#myModal_title').html(title)
@@ -820,7 +821,7 @@ function getInputs(title, inputs, callback) {
     })
 
     var onCreate = function () {
-        $('#myModal_Create').off('click', onCreate);
+        console.log('onCreate');
 
         // Update values
         Object.keys(inputs).forEach(function (key) {
@@ -832,6 +833,10 @@ function getInputs(title, inputs, callback) {
 
         callback();
     }
+
+    $('#myModal').on('hidden.bs.modal', function () {
+        $('#myModal_Create').off('click', onCreate);
+    });
 
     $('#myModal_Create').on('click', onCreate);
 
