@@ -430,11 +430,12 @@ function createActivity(request, data, node, id) {
             'placeholder': 'e.g. $(engine.path)\\InventorCoreConsole.exe /i $(args[inputFile].path) /al $(appbundles[ChangeParams].path) $(args[InventorParams].path)',
             'value': '',
             'options': {
-                'Inventor': '$(engine.path)\\InventorCoreConsole.exe /i $(args[inputFile].path) /al $(appbundles[<appbundlename>].path)',
-                'AutoCAD': '$(engine.path)\\accoreconsole.exe /i $(args[inputFile].path) /al $(appbundles[<appbundlename>].path) /s $(settings[script].path)',
-                'Revit': '$(engine.path)\\revitcoreconsole.exe /i $(args[inputFile].path) /al $(appbundles[<appbundlename>].path)',
-                '3dsMax': '$(engine.path)\\3dsmaxbatch.exe -sceneFile $(args[inputFile].path) $(settings[script].path)'
-            }
+                'Inventor': '["$(engine.path)\\InventorCoreConsole.exe /i $(args[inputFile].path) /al $(appbundles[<appbundlename>].path)"]',
+                'AutoCAD': '["$(engine.path)\\accoreconsole.exe /i $(args[inputFile].path) /al $(appbundles[<appbundlename>].path) /s $(settings[script].path)"]',
+                'Revit': '["$(engine.path)\\revitcoreconsole.exe /i $(args[inputFile].path) /al $(appbundles[<appbundlename>].path)"]',
+                '3dsMax': '["$(engine.path)\\3dsmaxbatch.exe -sceneFile $(args[inputFile].path) $(settings[script].path)"]'
+            },
+            'json': true
         },
         'parameters': {
             'text': 'Parameters',
