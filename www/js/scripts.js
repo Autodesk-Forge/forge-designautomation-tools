@@ -683,6 +683,10 @@ function prepareItemsTree(type) {
         console.log("select_node.jstree");
         let node = data.node;
 
+        // Just open the children of the node, so that it's easier
+        // to find the actual versions
+        $(`#${type}Tree`).jstree("open_node", data.node);
+
         let addButton = $(`#${type}Tree_add`).find('span')
         addButton.attr("class", (node.type === 'alias') ? "glyphicon glyphicon-play" : "glyphicon glyphicon-plus")
 
