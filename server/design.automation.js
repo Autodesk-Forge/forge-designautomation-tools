@@ -37,7 +37,22 @@ async function daRequest(req, path, method, headers, body) {
         options.body = body;
     }
     
-    return await requestPromise(options);
+    let data = [];
+    while (true) {
+        let response = await requestPromise(options);
+    
+        if (!response.paginationToken) {
+            if (data.length > 0) {
+                response.data = [...response.data, ...data];
+            }
+
+            return response;
+        } else {
+            options.uri = url + "?page=" + response.paginationToken;
+            data = [...data, ...response.data];
+        }
+    } 
+    
 }
 
 /*
