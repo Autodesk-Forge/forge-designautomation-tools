@@ -41,18 +41,17 @@ async function daRequest(req, path, method, headers, body) {
     while (true) {
         let response = await requestPromise(options);
     
-        if (!response.paginationToken) {
+        if (response && response.paginationToken) {
+            options.uri = url + "?page=" + response.paginationToken;
+            data = [...data, ...response.data];
+        } else {
             if (data.length > 0) {
                 response.data = [...response.data, ...data];
             }
 
             return response;
-        } else {
-            options.uri = url + "?page=" + response.paginationToken;
-            data = [...data, ...response.data];
         }
     } 
-    
 }
 
 /*
