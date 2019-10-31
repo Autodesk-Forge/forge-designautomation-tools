@@ -459,6 +459,20 @@ function createActivity(request, data, node, id) {
             },
             'json': true
         },
+        'settings': {
+            'text': 'Settings',
+            'placeholder': 'List of settings to use',
+            'value': '',
+            'multiline': true,
+            'options': {
+                'Use Script': '{ \n' +
+                    '  "script": { \n' +
+                    '    "value": "iLogicVb.RunRule(\\\"MyRule\\\")" \n' +
+                    '  }, \n' +
+                    '}'
+            },
+            'json': true
+        },
         'engine': {
             'text': 'Engine',
             'placeholder': 'e.g. Autodesk.Inventor+23',
