@@ -1,6 +1,7 @@
 var MyVars = {
     keepTrying: true,
-    options: {}
+    options: {},
+    report: null
 };
 
 $(document).ready(function () {
@@ -96,6 +97,10 @@ $(document).ready(function () {
         var nextNode = tree.jstree().get_next_dom(nodeId);
         tree.jstree().delete_node([nodeId]);
         tree.jstree('select_node', nextNode);
+    });
+
+    $("#workitemsTree_showReport").click(function (evt) {
+        $("#workitemsInfo").val(MyVars.report); 
     });
 
     function uuidv4() {
@@ -210,8 +215,6 @@ $(document).ready(function () {
     auth.click(function () {
         // Get the tokens
         get2LegToken(function (token) {
-            var auth = $("#authenticate");
-
             MyVars.token2Leg = token;
 
             auth.html('You\'re logged in');
@@ -220,6 +223,8 @@ $(document).ready(function () {
             prepareItemsTree('appbundles');
             prepareItemsTree('activities');
             prepareWorkitemsTree('workitems');
+
+            auth.addClass('disabled');
         });
     });
 
@@ -326,7 +331,7 @@ function isArraySame(arr1, arr2) {
 // the logged in user
 /////////////////////////////////////////////////////////////////
 
-function showItemsInfo(id, nickName, alias, type) {
+function showItemsInfo(id, nickName, alias, type, cb) {
     $.ajax({
         url: `/da/${type}/info`,
         data: {
@@ -335,7 +340,11 @@ function showItemsInfo(id, nickName, alias, type) {
             alias: alias
         },
         success: function (data) {
-            $(`#${type}Info`).val(JSON.stringify(data, null, 2));
+            let val = JSON.stringify(data, null, 2);
+            $(`#${type}Info`).val(val);
+            if (cb) {
+                cb(id, data)
+            }
         },
         error: function (err) {
             $(`#${type}Info`).val(JSON.stringify(err.responseJSON, null, 2));
@@ -753,9 +762,117 @@ function prepareWorkitemsTree(type) {
         console.log("select_node.jstree");
 
         let node = data.node;
-        showItemsInfo(node.id, '', '', type);
+        MyVars.report = null;
+        showItemsInfo(node.id, '', '', type, showChart);
     });
 }
+
+function showChart(id, input) {
+    if (!input.stats)
+        return
+
+    $.ajax({
+        url: `/da/report/${encodeURIComponent(input.reportUrl)}`,
+        type: 'GET',
+        success: function (data) {
+            MyVars.report = data
+            let isAutoCAD = data.match(/.*"Engine.Id":".*AutoCAD.*"/)
+            console.log(isAutoCAD)
+            let price = isAutoCAD ? 4 : 6  
+            createChart(input.stats, price)
+        },
+        error: function (err) {
+            createChart(input.stats, 6)
+        }
+    });
+
+
+        /*
+    if (input.reportUrl) {
+        fetch(input.reportUrl)
+        .then(text => {
+            MyVars.report = text
+            let engine = text.search(/.*"Engine.Id":([^\n\r]*)/)
+            console.log(engine)
+            let price = (engine.indexOf("AutoCAD") > 0) ? 4 : 6
+            createChart(input.stats, price)
+        })
+        .catch(err => {
+            createChart(input.stats, 6)
+        })
+    } else {
+        createChart(input.stats, 6)
+    }
+    */
+}
+
+function createChart(stats, price) {
+    let values = [
+        new Date(stats["timeQueued"]), 
+        new Date(stats["timeDownloadStarted"]),
+        new Date(stats["timeInstructionsStarted"]),
+        new Date(stats["timeInstructionsEnded"]),
+        new Date(stats["timeUploadEnded"]),
+        new Date(stats["timeFinished"])
+    ]    
+    let labels = [
+        "Queueing",
+        "Download",
+        "Running",
+        "Upload",
+        "Stopping",
+        "Overall"
+    ]
+    let colors = [
+        "#ff7f00", // orange
+        "#942192", // purple
+        "#009051", // moss
+        "#ff40ff", // magenta 
+        "#ff0000", // red
+        "#d6d6d6"  // silver
+    ]
+    
+    let times = [];
+    for (let i = 0; i  < labels.length - 1; i++) {
+        times[i] = (values[i+1] - values[i]) / 1000 // converting fom ms to s
+        times[i + 1] = 0
+    }
+
+    data = {
+        datasets: [{
+            data: times,
+            backgroundColor: colors
+        }, {
+            data: [0, 0, 0, 0, 0, (values[values.length - 1] - values[0]) / 1000],
+            backgroundColor: colors
+        }],
+    
+        // These labels appear in the legend and in the tooltips when hovering different arcs
+        labels: labels
+    };
+
+    var myDoughnutChart = new Chart('chartCanvas', {
+        type: 'doughnut',
+        data: data,
+        options: {
+            legend: {
+                position: 'right'
+            },
+            tooltips: {
+                callbacks: {
+                    label: function(tooltipItem, data) {
+                        let val = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index]
+                        return [
+                            val.toFixed(2) + " seconds",
+                            (val / 3600 * price).toFixed(2) + " cloud credits" 
+                        ]
+                    }
+                }
+            }
+        }
+    });
+}
+
 
 // 'inputs' is an array of objects with 'text', 'placeholder' and 'value' parameters 
 function getInputs(title, inputs, callback) {

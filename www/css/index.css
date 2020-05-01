@@ -55,6 +55,14 @@
     height: 363px;
     overflow: auto;
 }
+#workitemsTree {
+    height: 203px;
+    overflow: auto;
+}
+#chartCanvas {
+    width: 100%;
+    height: 160px;
+}
 .tab-pane {
     margin: 15px; 
 }
@@ -64,7 +72,6 @@
 #forgeUploadHidden {
     visibility: hidden;
 }
-
 
 @-webkit-keyframes spin {
     0% {

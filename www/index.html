@@ -11,11 +11,12 @@
     <link rel="stylesheet" href="/css/bootstrap.min.css">
 
     <!--type="text/css">-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
     <script language="JavaScript" src="/js/jquery.min.js"></script>
     <script language="JavaScript" src="/js/jquery.storageapi.min.js"></script>
     <script src="/js/jstree.js"></script>
     <script src="/js/bootstrap.min.js"></script>
-
+    
     <!-- for the viewer -->
     <script src="https://developer.api.autodesk.com/modelderivative/v2/viewers/three.min.js?v=v4.2"></script>
     <script src="https://developer.api.autodesk.com/modelderivative/v2/viewers/viewer3D.js?v=v4.2"></script>
@@ -83,13 +84,15 @@
 
                                     </div>
                                     <a id="appbundlesTree_refresh" style="display: inline-block; margin-top: 5px;"
-                                        class="btn btn-default">
+                                        class="btn btn-default" title="Refresh tree">
                                         <span class="glyphicon glyphicon-refresh"></span>
                                     </a>
-                                    <a id="appbundlesTree_add" style="display: inline-block; margin-top: 5px;" class="btn btn-default">
+                                    <a id="appbundlesTree_add" style="display: inline-block; margin-top: 5px;" 
+                                        class="btn btn-default" title="Create item">
                                         <span class="glyphicon glyphicon-plus"></span>
                                     </a>
-                                    <a id="appbundlesTree_delete" style="display: inline-block; margin-top: 5px;" class="btn btn-default">
+                                    <a id="appbundlesTree_delete" style="display: inline-block; margin-top: 5px;" 
+                                        class="btn btn-default" title="Delete item">
                                         <span class="glyphicon glyphicon-trash"></span>
                                     </a>
                                 </div>
@@ -109,13 +112,15 @@
 
                                     </div>
                                     <a id="activitiesTree_refresh" style="display: inline-block; margin-top: 5px;"
-                                        class="btn btn-default">
+                                        class="btn btn-default" title="Refresh tree">
                                         <span class="glyphicon glyphicon-refresh"></span>
                                     </a>
-                                    <a id="activitiesTree_add" style="display: inline-block; margin-top: 5px;" class="btn btn-default">
+                                    <a id="activitiesTree_add" style="display: inline-block; margin-top: 5px;" 
+                                        class="btn btn-default" title="Create item">
                                         <span class="glyphicon glyphicon-plus"></span>
                                     </a>
-                                    <a id="activitiesTree_delete" style="display: inline-block; margin-top: 5px;" class="btn btn-default">
+                                    <a id="activitiesTree_delete" style="display: inline-block; margin-top: 5px;" 
+                                        class="btn btn-default" title="Delete item">
                                         <span class="glyphicon glyphicon-trash"></span>
                                     </a>
                                 </div>
@@ -143,16 +148,24 @@
                                             <span class="glyphicon glyphicon-plus"></span>
                                         </a>
                                     -->
+                                    <canvas id="chartCanvas" class="form-control"></canvas>
                                     
-                                    <a id="workitemsTree_add" style="display: inline-block; margin-top: 5px;" class="btn btn-default">
+                                    <a id="workitemsTree_add" style="display: inline-block; margin-top: 5px;" 
+                                        class="btn btn-default" title="Add WorkItem">
                                         <span class="glyphicon glyphicon-plus"></span>
                                     </a>
 
-                                    <a id="workitemsTree_stop" style="display: inline-block; margin-top: 5px;" class="btn btn-default">
+                                    <a id="workitemsTree_stop" style="display: inline-block; margin-top: 5px;" 
+                                        class="btn btn-default" title="Stop WorkItem">
                                         <span class="glyphicon glyphicon-stop"></span>
                                     </a>
-                                    <a id="workitemsTree_delete" style="display: inline-block; margin-top: 5px;" class="btn btn-default">
+                                    <a id="workitemsTree_delete" style="display: inline-block; margin-top: 5px;" 
+                                        class="btn btn-default" title="Delete WorkItem">
                                         <span class="glyphicon glyphicon-trash"></span>
+                                    </a>
+                                    <a id="workitemsTree_showReport" style="display: inline-block; margin-top: 5px;" 
+                                        class="btn btn-default" title="Show report">
+                                        <span class="glyphicon glyphicon-book"></span>
                                     </a>
                                 </div>
 

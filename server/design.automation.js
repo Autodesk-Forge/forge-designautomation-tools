@@ -612,6 +612,20 @@ router.get('/workitems/treeNode', async function(req, res) {
     }
 });
 
+router.get('/report/:url', async function(req, res) {
+    console.log('GET /report');
+    var inputUrl = req.params.url;
+
+    var downloadOptions = {
+        uri: inputUrl,
+        method: 'GET'
+    }
+
+    var result = await requestPromise(downloadOptions);
+
+    res.end(result);
+});
+
 /////////////////////////////////////////////////////////////////
 // Collects the information that we need to pass to the
 // file tree object on the client
