@@ -1,7 +1,8 @@
 var MyVars = {
     keepTrying: true,
     options: {},
-    report: null
+    report: null,
+    chart: null
 };
 
 $(document).ready(function () {
@@ -231,6 +232,42 @@ $(document).ready(function () {
     $('#progressInfo').click(function () {
         MyVars.keepTrying = false;
         showProgress("Translation stopped", 'failed');
+    });
+
+    $("#copyChartData").click(function (evt) {
+        let textArea = document.createElement("textarea")
+
+        let configData = MyVars.chart.config.data
+
+        // header
+        let text = "Data"
+        for (let key in configData.labels) {
+            text += "\t" + configData.labels[key]
+        }
+        text += "\n"
+        // times (in seconds)
+        let data = configData.datasets[0].data
+        text +="Time (s)"
+        let overall = 0
+        for (let key = 0; key < data.length - 1; key++) {
+            overall += data[key]
+            text += "\t" + data[key]
+        }
+        text += "\t" + overall + "\n"
+        // cost (cloud credits)
+        text +="Cost (cc)"
+        overall = 0
+        for (let key = 0; key < data.length - 1; key++) {
+            overall += data[key] * configData.price / 3600
+            text += "\t" + data[key] * configData.price / 3600
+        }
+        text += "\t" + overall
+
+        textArea.value = text
+        document.body.appendChild(textArea)
+        textArea.select()
+        document.execCommand('copy')
+        document.body.removeChild(textArea)
     });
 }); // $(document).ready
 
@@ -785,25 +822,6 @@ function showChart(id, input) {
             createChart(input.stats, 6)
         }
     });
-
-
-        /*
-    if (input.reportUrl) {
-        fetch(input.reportUrl)
-        .then(text => {
-            MyVars.report = text
-            let engine = text.search(/.*"Engine.Id":([^\n\r]*)/)
-            console.log(engine)
-            let price = (engine.indexOf("AutoCAD") > 0) ? 4 : 6
-            createChart(input.stats, price)
-        })
-        .catch(err => {
-            createChart(input.stats, 6)
-        })
-    } else {
-        createChart(input.stats, 6)
-    }
-    */
 }
 
 function createChart(stats, price) {
@@ -848,10 +866,12 @@ function createChart(stats, price) {
         }],
     
         // These labels appear in the legend and in the tooltips when hovering different arcs
-        labels: labels
+        labels: labels,
+
+        price: price
     };
 
-    var myDoughnutChart = new Chart('chartCanvas', {
+    MyVars.chart = new Chart('chartCanvas', {
         type: 'doughnut',
         data: data,
         options: {

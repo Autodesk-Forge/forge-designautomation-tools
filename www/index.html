@@ -148,7 +148,12 @@
                                             <span class="glyphicon glyphicon-plus"></span>
                                         </a>
                                     -->
-                                    <canvas id="chartCanvas" class="form-control"></canvas>
+                                    <div id="chartCanvasContainer" class="form-control">
+                                        <canvas id="chartCanvas"></canvas>
+                                        <div id="copyChartData" title="Copy chart data to clipboard">
+                                            <span class="glyphicon glyphicon-copy"></span>
+                                        </div>
+                                    </div>
                                     
                                     <a id="workitemsTree_add" style="display: inline-block; margin-top: 5px;" 
                                         class="btn btn-default" title="Add WorkItem">
