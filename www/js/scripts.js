@@ -684,9 +684,13 @@ function createItem(type) {
             createActivity(request, data, node);
         }
     } else if (node.type === 'item') {
-
-        if (node.id.startsWith('Shared'))
+        if (node.id.startsWith('Shared')) {
+            if (type === 'activities') {
+                data.id += "//" // so that our server will see it as an alias
+                createWorkitem(request, data, node, node.text)
+            }
             return;
+        }
 
         if (type === 'appbundles') {
             createAppbundle(request, data, node, node.text);
@@ -748,16 +752,21 @@ function prepareItemsTree(type) {
         $(`#${type}Tree`).jstree("open_node", data.node);
 
         let addButton = $(`#${type}Tree_add`).find('span')
-        addButton.attr("class", (node.type === 'alias') ? "glyphicon glyphicon-play" : "glyphicon glyphicon-plus")
 
         if (node.type === 'alias') {
             var itemNode = $(`#${type}Tree`).jstree(true).get_node(node.parents[1]);
+            addButton.attr("class", (type === "activities") ? "glyphicon glyphicon-play" : "glyphicon glyphicon-plus")
             showItemsInfo(node.id, itemNode.original.nickName, itemNode.original.alias, type);
         } else if (node.type === 'item') {
-            // Shared items have "alias" property 
-            if (node.original.alias) {
+            // Shared items have proper "alias" property 
+            if (node.original.alias && node.original.alias !== "$LATEST") {
+                addButton.attr("class", (type === "activities") ? "glyphicon glyphicon-play" : "glyphicon glyphicon-plus")
                 showItemsInfo(node.id, node.original.nickName, node.original.alias, type);
+            } else  {
+                addButton.attr("class", "glyphicon glyphicon-plus")
             }
+        } else {
+            addButton.attr("class", "glyphicon glyphicon-plus")
         }
     });
 }
