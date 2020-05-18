@@ -52,6 +52,7 @@ If you click any of the items then an update will be requested from the server a
 
 6. Whenever you are requested to provide a file (for an **AppBundle** or for a **Workitem**) you need to provide a publicly accessible **URL** to it \
 One easy way to generate such **URLs** is to use the **Forge OSS** and a utility like [https://oss-manager.autodesk.io](https://oss-manager.autodesk.io) to upload files and generate *read/write* **URLs** for them
+![thumbnail](/readme/OssManagerPresignedUrl.png)
 
 # Setup
 
