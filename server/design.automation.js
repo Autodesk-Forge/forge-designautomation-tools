@@ -342,7 +342,7 @@ async function getItemVersions(req, type, id) {
     let page = '';
 
     while (true) {
-        let response = await daRequest(req, `${type}/${id}/versions?${page}`, 'GET');
+        let response = await daRequest(req, `${type}/${id}/versions${page}`, 'GET');
         response.data.map((item) => {
             versions.push({ id: item, children: false });
         })
@@ -350,7 +350,7 @@ async function getItemVersions(req, type, id) {
         if (!response.paginationToken)
             break;
 
-        page = `page=${response.paginationToken}`;
+        page = `?page=${response.paginationToken}`;
     }
 
     return versions;
