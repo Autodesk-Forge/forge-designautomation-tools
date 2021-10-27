@@ -39,7 +39,12 @@ async function daRequest(req, path, method, headers, body) {
     
     let data = [];
     while (true) {
-        let response = await requestPromise(options);
+        let response;
+        try {
+          response = await requestPromise(options);
+        } catch (ex) {
+          console.log(ex.message);
+        }
     
         if (response && response.paginationToken) {
             options.uri = url + "?page=" + response.paginationToken;
@@ -402,11 +407,15 @@ function getAliasesForVersion(aliases, version) {
     return versionAliases;
 }
 
-async function createItemAlias(req, type, id, version, alias) {
-    let response = await daRequest(req, `${type}/${id}/aliases`, 'POST', null, {
-        "version": parseInt(version), // has to be numeric
-        "id": alias
-    });
+async function createItemAlias(req, type, id, version, alias, receiver) {
+    let data = {
+      "version": parseInt(version), // has to be numeric
+      "id": alias
+    };
+    if (receiver && receiver != "")
+      data.receiver = receiver;
+
+    let response = await daRequest(req, `${type}/${id}/aliases`, 'POST', null, data);
 
     return response; 
 }
@@ -522,7 +531,7 @@ router.post('/:type', jsonParser, async function(req, res) {
             res.json(reply);
         } else if (level === 3) {
             // create alias for version
-            var reply = await createItemAlias(req, type, paths[1], paths[2], req.body.alias);
+            var reply = await createItemAlias(req, type, paths[1], paths[2], req.body.alias, req.body.receiver);
             res.json(reply);
         } else {
             // create workitem

@@ -426,13 +426,13 @@ function createAppbundle(request, data, node, id) {
     var inputs = {
         'engine': {
             'text': 'Engine',
-            'placeholder': 'e.g. Autodesk.Inventor+23',
+            'placeholder': 'e.g. Autodesk.Inventor+2022',
             'value': '',
             'options': {
-                'Inventor': 'Autodesk.Inventor+23',
-                'AutoCAD': 'Autodesk.AutoCAD+23',
-                'Revit': 'Autodesk.Revit+23',
-                '3dsMax': 'Autodesk.3dsMax+23'
+                'Inventor': 'Autodesk.Inventor+2022',
+                'AutoCAD': 'Autodesk.AutoCAD+24_1',
+                'Revit': 'Autodesk.Revit+2022',
+                '3dsMax': 'Autodesk.3dsMax+2022'
             }
         },
         'description': {
@@ -473,13 +473,13 @@ function createActivity(request, data, node, id) {
     var inputs = {
         'commandLine': {
             'text': 'Command line',
-            'placeholder': 'e.g. $(engine.path)\\InventorCoreConsole.exe /i $(args[inputFile].path) /al $(appbundles[ChangeParams].path) $(args[InventorParams].path)',
+            'placeholder': 'e.g. $(engine.path)\\\\InventorCoreConsole.exe ...',
             'value': '',
             'options': {
-                'Inventor': '["$(engine.path)\\InventorCoreConsole.exe /i $(args[inputFile].path) /al $(appbundles[<appbundlename>].path)"]',
-                'AutoCAD': '["$(engine.path)\\accoreconsole.exe /i $(args[inputFile].path) /al $(appbundles[<appbundlename>].path) /s $(settings[script].path)"]',
-                'Revit': '["$(engine.path)\\revitcoreconsole.exe /i $(args[inputFile].path) /al $(appbundles[<appbundlename>].path)"]',
-                '3dsMax': '["$(engine.path)\\3dsmaxbatch.exe -sceneFile $(args[inputFile].path) $(settings[script].path)"]'
+                'Inventor': '["$(engine.path)\\\\InventorCoreConsole.exe /i \\"$(args[inputFile].path)\\" /al \\"$(appbundles[<appbundlename>].path)\\""]',
+                'AutoCAD': '["$(engine.path)\\\\accoreconsole.exe /i \\"$(args[inputFile].path)\\" /al \\"$(appbundles[<appbundlename>].path) /s $(settings[script].path)\\""]',
+                'Revit': '["$(engine.path)\\\\revitcoreconsole.exe /i \\"$(args[inputFile].path)\\" /al \\"$(appbundles[<appbundlename>].path)\\""]',
+                '3dsMax': '["$(engine.path)\\\\3dsmaxbatch.exe -sceneFile \\"$(args[inputFile].path)\\" \\"$(settings[script].path)\\""]'
             },
             'json': true
         },
@@ -521,13 +521,13 @@ function createActivity(request, data, node, id) {
         },
         'engine': {
             'text': 'Engine',
-            'placeholder': 'e.g. Autodesk.Inventor+23',
+            'placeholder': 'e.g. Autodesk.Inventor+2022',
             'value': '',
             'options': {
-                'Inventor': 'Autodesk.Inventor+23',
-                'AutoCAD': 'Autodesk.AutoCAD+23',
-                'Revit': 'Autodesk.Revit+23',
-                '3dsMax': 'Autodesk.3dsMax+23'
+                'Inventor': 'Autodesk.Inventor+2022',
+                'AutoCAD': 'Autodesk.AutoCAD+24_1',
+                'Revit': 'Autodesk.Revit+2022',
+                '3dsMax': 'Autodesk.3dsMax+2022'
             }
         },
         'appbundles': {
@@ -559,13 +559,15 @@ function createActivity(request, data, node, id) {
     var alias = getInputs('Info', inputs, () => {
         data.body = {};
         Object.keys(inputs).forEach(function (key) {
-            data.body[key] = inputs[key].value;
-            if (inputs[key].json) {
-                try {
-                    data.body[key] = JSON.parse(data.body[key])
-                } catch {
-                    alert(`Error parsing ${key} parameter`)
-                }
+            if (inputs[key].value != '') {
+              data.body[key] = inputs[key].value;
+              if (inputs[key].json) {
+                  try {
+                      data.body[key] = JSON.parse(data.body[key])
+                  } catch {
+                      alert(`Error parsing ${key} parameter`)
+                  }
+              }
             }
         });
 
@@ -668,10 +670,16 @@ function createItem(type) {
                 'text': 'Alias name',
                 'placeholder': 'e.g. v12',
                 'value': ''
+            },
+            'receiver': {
+              'text': 'Receiver',
+              'placeholder': 'Client ID of Forge app to share it with',
+              'value': ''
             }
         };
         var alias = getInputs('Info', inputs, () => {
             data.alias = inputs.alias.value;
+            data.receiver = inputs.receiver.value;
             request(type, data, node);
         });
     } else if (node.type === 'folder') {
