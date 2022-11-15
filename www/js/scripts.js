@@ -309,10 +309,13 @@ function get2LegToken(callback) {
         var client_secret = $('#client_secret').val();
         $.ajax({
             url: '/user/token',
-            data: {
+            type: "POST",
+            contentType: "application/json",
+            dataType: "json",
+            data: JSON.stringify({
                 client_id: client_id,
                 client_secret: client_secret
-            },
+            }),
             success: function (data) {
                 MyVars.token2Leg = data.token;
                 console.log('Returning new 3 legged token (User Authorization): ' + MyVars.token2Leg);
